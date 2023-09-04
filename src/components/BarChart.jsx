@@ -9,21 +9,6 @@ import StreamingPlugin from "chartjs-plugin-streaming";
 
 Chart.register(StreamingPlugin);
 
-const columns = [
-  {
-    field: "timestamp",
-    headerName: "Fecha",
-  },
-  {
-    field: "temperature",
-    headerName: "Temperatura",
-  },
-  {
-    field: "humidity",
-    headerName: "Humedad",
-  },
-];
-
 const token =
   "6MYx3wUjddL5KbNas8u4P-ieVg4oujjMDi7GCC_lSqLaLkhNKx9gP7e4bf2HaZQO1IybCwE1Gjjzc44bcINndw==";
 const org = "UControl";
@@ -70,6 +55,7 @@ export const BarChart = () => {
 
   useEffect(() => {
     let resT = [];
+    let resH = [];
     const influxQuery = async () => {
       //create InfluxDB client
       const queryApi = new InfluxDB({ url, token }).getQueryApi(org);
@@ -114,14 +100,11 @@ export const BarChart = () => {
           }
 
           setDataTemp(finalData);
-          console.log(dataTemp);
         },
         error(error) {
-          console.log("query failed- ", error);
+          console.log("temp query failed- ", error);
         },
       });
-
-      let resH = [];
       await queryApi.queryRows(queryH, {
         next(row, tableMeta) {
           const o = tableMeta.toObject(row);
@@ -162,17 +145,22 @@ export const BarChart = () => {
           }
 
           setDataHum(finalData);
-          console.log(dataHum);
         },
         error(error) {
-          console.log("query failed- ", error);
+          console.log("hum query failed- ", error);
         },
       });
     };
-    try {
+    const interval = setInterval(() => {
       influxQuery();
-    } catch (error) {}
+    }, 20000);
+    return () => clearInterval(interval);
   }, [dataHum, dataTemp]);
+
+  useEffect(() => {
+    console.log(dataTemp);
+    console.log(dataHum);
+  }, [dataTemp, dataHum]);
 
   return (
     <div
