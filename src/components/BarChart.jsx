@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { InfluxDB } from "@influxdata/influxdb-client";
-import { ResponsiveLine } from "@nivo/line";
 
 import { Bar } from "react-chartjs-2";
 import "chartjs-adapter-luxon";
@@ -153,7 +152,7 @@ export const BarChart = () => {
     };
     const interval = setInterval(() => {
       influxQuery();
-    }, 20000);
+    }, 10000);
     return () => clearInterval(interval);
   }, [dataHum, dataTemp]);
 
